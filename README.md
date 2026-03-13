@@ -16,6 +16,8 @@ GitHub's documentation doesn't always cover every edge case or subtle behavior o
 2. **Document the experiment design** in `DESIGN.md` to guide the implementation and execution of tests.
 3. **Run the tests** and document the findings in `RESULTS.md`.
 
+For details about creating branches refer to [CONTRIBUTING.md](CONTRIBUTING.md#git-branching-model).
+
 ## Topics of Interest
 
 - GitHub Actions trigger conditions and event behavior
