@@ -60,9 +60,21 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if ! [[ "$SAMPLE_SIZE" =~ ^[0-9]+$ ]] || [[ "$SAMPLE_SIZE" -lt 1 ]]; then
-  echo "Error: sample size must be a positive integer" >&2
+if ! [[ "$SAMPLE_SIZE" =~ ^-?[0-9]+$ ]]; then
+  echo "Error: -n expects a numerical value, got '$SAMPLE_SIZE'" >&2
+  echo "Usage: $0 [-n N]  (N: 1–50, default: $DEFAULT_SAMPLE_SIZE)" >&2
   exit 1
+fi
+
+if [[ "$SAMPLE_SIZE" -le 0 ]]; then
+  echo "Warning: N=$SAMPLE_SIZE is not positive, using N=1" >&2
+  SAMPLE_SIZE=1
+fi
+
+MAX_SAMPLE_SIZE=50
+if [[ "$SAMPLE_SIZE" -gt "$MAX_SAMPLE_SIZE" ]]; then
+  echo "Warning: N=$SAMPLE_SIZE exceeds maximum, capping to N=$MAX_SAMPLE_SIZE" >&2
+  SAMPLE_SIZE="$MAX_SAMPLE_SIZE"
 fi
 
 # ─── Derive repo info ───────────────────────────────────────────────────────
