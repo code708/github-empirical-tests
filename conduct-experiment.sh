@@ -102,10 +102,11 @@ epoch_ms() {
 
 iso_to_epoch_ms() {
   python3 -c "
+import sys
 from datetime import datetime, timezone
-dt = datetime.fromisoformat('$1'.replace('Z', '+00:00'))
+dt = datetime.fromisoformat(sys.argv[1].replace('Z', '+00:00'))
 print(int(dt.timestamp() * 1000))
-"
+" "$1"
 }
 
 log() {
