@@ -51,10 +51,10 @@ Then we want to hypothesize about the factors that influence the delay and desig
 
 Both timestamps come from GitHub's server clock — **zero clock skew**.
 
-| Timestamp | Source | Description |
-|---|---|---|
-| T_pushed | GitHub Events API | `created_at` of the `PushEvent` matching the commit SHA |
-| T_dispatched | GitHub Actions API | `created_at` of the workflow run object |
+| Timestamp    | Source             | Description                                             |
+| ------------ | ------------------ | ------------------------------------------------------- |
+| T_pushed     | GitHub Events API  | `created_at` of the `PushEvent` matching the commit SHA |
+| T_dispatched | GitHub Actions API | `created_at` of the workflow run object                 |
 
 **Primary metric:** `dispatch_delay_ms = T_dispatched - T_pushed`
 
@@ -87,37 +87,37 @@ A single run (`./conduct-experiment.sh -n N`) executes all conditions sequential
 
 ### Single-Factor Conditions
 
-| # | Condition | amount | size | delay | concurrent | Hypothesis |
-|---|-----------|--------|------|-------|------------|------------|
-| 1 | Baseline | 1 | small | 5s | 0 | Reference distribution |
-| 2 | Medium files | 1 | medium | 5s | 0 | Minimal effect — GitHub decouples webhooks from object storage |
-| 3 | Large files | 1 | large | 5s | 0 | Same as above |
-| 4 | 5 files | 5 | small | 5s | 0 | More files per commit shouldn't affect dispatch |
-| 5 | 10 files | 10 | small | 5s | 0 | Same as above |
-| 6 | 50 files | 50 | small | 5s | 0 | Same as above |
-| 7 | 5 concurrent | 1 | small | 5s | 5 | Per-repo queuing may delay dispatch |
-| 8 | 10 concurrent | 1 | small | 5s | 10 | Same as above |
-| 9 | Fast push (1s) | 1 | small | 1s | 0 | Rapid pushes may queue, increasing delay |
-| 10 | Rapid push (0s) | 1 | small | 0s | 0 | Same as above |
+| #   | Condition       | amount | size   | delay | concurrent | Hypothesis                                                     |
+| --- | --------------- | ------ | ------ | ----- | ---------- | -------------------------------------------------------------- |
+| 1   | Baseline        | 1      | small  | 5s    | 0          | Reference distribution                                         |
+| 2   | Medium files    | 1      | medium | 5s    | 0          | Minimal effect — GitHub decouples webhooks from object storage |
+| 3   | Large files     | 1      | large  | 5s    | 0          | Same as above                                                  |
+| 4   | 5 files         | 5      | small  | 5s    | 0          | More files per commit shouldn't affect dispatch                |
+| 5   | 10 files        | 10     | small  | 5s    | 0          | Same as above                                                  |
+| 6   | 50 files        | 50     | small  | 5s    | 0          | Same as above                                                  |
+| 7   | 5 concurrent    | 1      | small  | 5s    | 5          | Per-repo queuing may delay dispatch                            |
+| 8   | 10 concurrent   | 1      | small  | 5s    | 10         | Same as above                                                  |
+| 9   | Fast push (1s)  | 1      | small  | 1s    | 0          | Rapid pushes may queue, increasing delay                       |
+| 10  | Rapid push (0s) | 1      | small  | 0s    | 0          | Same as above                                                  |
 
 ### Multi-Factorial Conditions
 
-| # | Condition | amount | size | delay | concurrent | Hypothesis |
-|---|-----------|--------|------|-------|------------|------------|
-| 11 | medium×5 | 5 | medium | 10s | 0 | Combined size+amount effect |
-| 12 | medium×10 | 10 | medium | 10s | 0 | Same as above |
-| 13 | medium×50 | 50 | medium | 10s | 0 | Same as above |
-| 14 | large×5 | 5 | large | 10s | 0 | Same as above |
-| 15 | large×10 | 10 | large | 10s | 0 | Same as above |
-| 16 | large×50 | 50 | large | 10s | 0 | Same as above |
-| 17 | medium×10+5c | 10 | medium | 10s | 5 | Size+amount+load interaction |
-| 18 | medium×10+10c | 10 | medium | 10s | 10 | Same as above |
-| 19 | medium×50+5c | 50 | medium | 10s | 5 | Same as above |
-| 20 | medium×50+10c | 50 | medium | 10s | 10 | Same as above |
-| 21 | medium×10+1s | 10 | medium | 1s | 0 | Size+amount+frequency interaction |
-| 22 | medium×10+0s | 10 | medium | 0s | 0 | Same as above |
-| 23 | medium×50+1s | 50 | medium | 1s | 0 | Same as above |
-| 24 | medium×50+0s | 50 | medium | 0s | 0 | Same as above |
+| #   | Condition     | amount | size   | delay | concurrent | Hypothesis                        |
+| --- | ------------- | ------ | ------ | ----- | ---------- | --------------------------------- |
+| 11  | medium×5      | 5      | medium | 10s   | 0          | Combined size+amount effect       |
+| 12  | medium×10     | 10     | medium | 10s   | 0          | Same as above                     |
+| 13  | medium×50     | 50     | medium | 10s   | 0          | Same as above                     |
+| 14  | large×5       | 5      | large  | 10s   | 0          | Same as above                     |
+| 15  | large×10      | 10     | large  | 10s   | 0          | Same as above                     |
+| 16  | large×50      | 50     | large  | 10s   | 0          | Same as above                     |
+| 17  | medium×10+5c  | 10     | medium | 10s   | 5          | Size+amount+load interaction      |
+| 18  | medium×10+10c | 10     | medium | 10s   | 10         | Same as above                     |
+| 19  | medium×50+5c  | 50     | medium | 10s   | 5          | Same as above                     |
+| 20  | medium×50+10c | 50     | medium | 10s   | 10         | Same as above                     |
+| 21  | medium×10+1s  | 10     | medium | 1s    | 0          | Size+amount+frequency interaction |
+| 22  | medium×10+0s  | 10     | medium | 0s    | 0          | Same as above                     |
+| 23  | medium×50+1s  | 50     | medium | 1s    | 0          | Same as above                     |
+| 24  | medium×50+0s  | 50     | medium | 0s    | 0          | Same as above                     |
 
 **Total trials per run:** 24 conditions × N. With N=10: 240 trials, ~50 min runtime.
 
