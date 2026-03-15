@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+AUTH_SCRIPT="${SCRIPT_DIR}/gh-auth.sh"
+
+if [[ ! -f "$AUTH_SCRIPT" ]]; then
+  echo "Error: $AUTH_SCRIPT not found. See CONTRIBUTING.md for PAT setup." >&2
+  exit 1
+fi
+
+# shellcheck source=gh-auth.sh
+source "$AUTH_SCRIPT"
+
 # ─── Constants ───────────────────────────────────────────────────────────────
 
 MAIN_BRANCH="workflow/dispatch-timing/main"
@@ -167,6 +178,20 @@ preflight() {
   if [[ "$fail" -eq 1 ]]; then
     exit 1
   fi
+}
+
+# ─── Push URL setup ──────────────────────────────────────────────────────────
+
+setup_push_url() {
+  local token
+  token=$(get_token) || { echo "Error: get_token failed. Check gh-auth.sh" >&2; exit 1; }
+  local https_url="https://x-access-token:${token}@github.com/${OWNER}/${REPO}.git"
+  git remote set-url --push origin "$https_url"
+  log "Configured HTTPS push URL"
+}
+
+restore_push_url() {
+  git remote set-url --push origin "$REMOTE_URL"
 }
 
 # ─── Branch setup ────────────────────────────────────────────────────────────
@@ -367,6 +392,8 @@ run_trial() {
 
 main() {
   preflight
+  setup_push_url
+  trap restore_push_url EXIT
 
   mkdir -p "$RUNS_DIR" "$PAYLOADS_DIR"
   : > "$LOG_FILE"

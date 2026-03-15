@@ -14,12 +14,19 @@ Results are committed to the run branch and copied to `workflow/dispatch-timing/
 2. **Authenticate `gh`** — `gh auth login` with a token or browser flow
 3. **Verify token scopes** — `gh auth status` must show:
    - `actions:read` (to query workflow runs)
-   - `contents:write` (to push commits)
-   - **Note:** The classic `repo` scope is a superset that includes both. If your token shows `repo`, you're covered.
+   - **Note:** The classic `repo` scope is a superset. If your token shows `repo`, you're covered.
    - If using a fine-grained PAT: repository access to `github-empirical-tests`, permissions: Actions (read), Contents (read+write)
-4. **Install `jq`** — `brew install jq` (macOS) — used for JSON parsing in the script
-5. **Install `python3`** — required for epoch-ms timestamps (pre-installed on macOS)
-6. **Clone and checkout** — `git clone` the repo, `git checkout workflow/dispatch-timing/main`
+4. **Create `gh-auth.sh`** — The script pushes over HTTPS to avoid SSH key prompts (e.g. YubiKey touch) that block unattended execution. Create `gh-auth.sh` in the project root with a `get_token` function that returns your PAT. The same PAT used for `.mcp.json` can be reused. See CONTRIBUTING.md for PAT setup.
+   ```sh
+   #!/usr/bin/env bash
+   get_token() {
+     security find-generic-password -a "$USER" -s "YOUR_PAT_NAME" -w
+   }
+   ```
+   The PAT must have `contents:write` scope.
+5. **Install `jq`** — `brew install jq` (macOS) — used for JSON parsing in the script
+6. **Install `python3`** — required for epoch-ms timestamps (pre-installed on macOS)
+7. **Clone and checkout** — `git clone` the repo, `git checkout workflow/dispatch-timing/main`
 
 #### GitHub Repository Settings
 
@@ -32,6 +39,7 @@ Results are committed to the run branch and copied to `workflow/dispatch-timing/
 ```sh
 gh auth status                                              # Confirm auth + scopes
 gh api repos/{owner}/{repo}/actions/workflows               # Confirm Actions API access
+source gh-auth.sh && get_token > /dev/null          # Confirm PAT retrieval
 jq --version                                                # Confirm jq installed
 python3 -c "import time; print(int(time.time() * 1000))"   # Confirm python3
 git branch --show-current                                   # Should be workflow/dispatch-timing/main
