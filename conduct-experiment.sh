@@ -406,8 +406,12 @@ main() {
 
   log "Experiment complete. Results: $CSV_FILE"
 
+  # Commit log and CSV to the run branch
+  git add -f "$CSV_FILE" "$LOG_FILE"
+  git commit -m "test(exec): Add run artifacts for N=$SAMPLE_SIZE" --quiet || true
+  git push origin "$RUN_BRANCH" --quiet 2>/dev/null || true
+
   # Commit results CSV to main branch (log stays on run branch only)
-  log "Committing results to $MAIN_BRANCH"
   local csv_abs
   csv_abs=$(realpath "$CSV_FILE")
   git checkout "$MAIN_BRANCH"

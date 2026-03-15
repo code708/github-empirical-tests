@@ -95,8 +95,9 @@ A single run (`./conduct-experiment.sh -n N`) executes all conditions sequential
 - Each run executes on a dedicated branch: `workflow/dispatch-timing/run-N=<N>`
 - At startup the script rebases the run branch onto the latest `workflow/dispatch-timing/main`
 - If the branch already exists, it is reset to `workflow/dispatch-timing/main` and force-pushed
-- After a run completes, results (CSV + analysis) are committed to `workflow/dispatch-timing/main`
-- The run branch is a transient workspace; `main` is the source of truth for results
+- After a run completes, all artifacts (CSV, log, payloads) are committed to the run branch
+- The results CSV is then copied and committed to `workflow/dispatch-timing/main`
+- The run branch is a full record of the run; `main` is the source of truth for results
 
 ## CSV Schema
 
