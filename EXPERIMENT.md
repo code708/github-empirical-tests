@@ -1,5 +1,42 @@
 # Dispatch Timing Experiment
 
+## Running the Experiment
+
+`./conduct-experiment.sh -n N` runs the full suite of conditions with N trials each.
+
+Results are committed to the run branch and copied to `workflow/dispatch-timing/main`.
+
+### Prerequisites
+
+#### Local Prerequisites
+
+1. **Install `gh` CLI** — `brew install gh` (macOS) or see https://cli.github.com/
+2. **Authenticate `gh`** — `gh auth login` with a token or browser flow
+3. **Verify token scopes** — `gh auth status` must show:
+   - `actions:read` (to query workflow runs)
+   - `contents:write` (to push commits)
+   - **Note:** The classic `repo` scope is a superset that includes both. If your token shows `repo`, you're covered.
+   - If using a fine-grained PAT: repository access to `github-empirical-tests`, permissions: Actions (read), Contents (read+write)
+4. **Install `jq`** — `brew install jq` (macOS) — used for JSON parsing in the script
+5. **Install `python3`** — required for epoch-ms timestamps (pre-installed on macOS)
+6. **Clone and checkout** — `git clone` the repo, `git checkout workflow/dispatch-timing/main`
+
+#### GitHub Repository Settings
+
+1. **GitHub Actions must be enabled** — Settings → Actions → General → "Allow all actions and reusable workflows"
+2. **Branch protection** — Ensure `workflow/dispatch-timing/**` branches allow direct pushes (configured per CONTRIBUTING.md)
+3. **Workflow files must exist on the branch** — The noop and load workflows must be committed and pushed to `workflow/dispatch-timing/main` before running the experiment
+
+#### Verification Checklist
+
+```sh
+gh auth status                                              # Confirm auth + scopes
+gh api repos/{owner}/{repo}/actions/workflows               # Confirm Actions API access
+jq --version                                                # Confirm jq installed
+python3 -c "import time; print(int(time.time() * 1000))"   # Confirm python3
+git branch --show-current                                   # Should be workflow/dispatch-timing/main
+```
+
 ## Problem Statement
 
 GitHub doesn't guarantee instant workflow dispatch — there can be a delay between the trigger event (e.g. push) and the workflow run appearing via the API.
@@ -103,37 +140,6 @@ A single run (`./conduct-experiment.sh -n N`) executes all conditions sequential
 
 ```
 condition,trial,commit_sha,amount,size,delay,concurrent,pushed_at_iso,pushed_at_epoch_ms,dispatched_at_iso,dispatched_at_epoch_ms,dispatch_delay_ms,run_id,run_status,timeout
-```
-
-## Prerequisites
-
-### Local Prerequisites
-
-1. **Install `gh` CLI** — `brew install gh` (macOS) or see https://cli.github.com/
-2. **Authenticate `gh`** — `gh auth login` with a token or browser flow
-3. **Verify token scopes** — `gh auth status` must show:
-   - `actions:read` (to query workflow runs)
-   - `contents:write` (to push commits)
-   - **Note:** The classic `repo` scope is a superset that includes both. If your token shows `repo`, you're covered.
-   - If using a fine-grained PAT: repository access to `github-empirical-tests`, permissions: Actions (read), Contents (read+write)
-4. **Install `jq`** — `brew install jq` (macOS) — used for JSON parsing in the script
-5. **Install `python3`** — required for epoch-ms timestamps (pre-installed on macOS)
-6. **Clone and checkout** — `git clone` the repo, `git checkout workflow/dispatch-timing/main`
-
-### GitHub Repository Settings
-
-1. **GitHub Actions must be enabled** — Settings → Actions → General → "Allow all actions and reusable workflows"
-2. **Branch protection** — Ensure `workflow/dispatch-timing/**` branches allow direct pushes (configured per CONTRIBUTING.md)
-3. **Workflow files must exist on the branch** — The noop and load workflows must be committed and pushed to `workflow/dispatch-timing/main` before running the experiment
-
-### Verification Checklist
-
-```sh
-gh auth status                                              # Confirm auth + scopes
-gh api repos/{owner}/{repo}/actions/workflows               # Confirm Actions API access
-jq --version                                                # Confirm jq installed
-python3 -c "import time; print(int(time.time() * 1000))"   # Confirm python3
-git branch --show-current                                   # Should be workflow/dispatch-timing/main
 ```
 
 ## Key Risks
