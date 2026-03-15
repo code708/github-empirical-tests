@@ -73,6 +73,7 @@ This repo does not track issues.
 #### Allowed Use Cases
 
 - _merge-queue_
+- _workflow_
 
 > Use cases represent github features or an orchestration of such. Add new use cases as they emerge over time
 
