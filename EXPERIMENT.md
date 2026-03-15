@@ -39,9 +39,9 @@ Results are committed to the run branch and copied to `workflow/dispatch-timing/
 ```sh
 gh auth status                                              # Confirm auth + scopes
 gh api repos/{owner}/{repo}/actions/workflows               # Confirm Actions API access
-source gh-auth.sh && get_token > /dev/null          # Confirm PAT retrieval
+source gh-auth.sh && get_token > /dev/null                  # Confirm PAT retrieval
 jq --version                                                # Confirm jq installed
-python3 -c "import time; print(int(time.time() * 1000))"   # Confirm python3
+python3 -c "import time; print(int(time.time() * 1000))"    # Confirm python3
 git branch --show-current                                   # Should be workflow/dispatch-timing/main
 ```
 
