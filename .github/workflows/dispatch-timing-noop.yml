@@ -2,7 +2,7 @@ name: dispatch-timing-noop
 on:
   push:
     branches:
-      - 'workflow/dispatch-timing/**'
+      - 'workflow/dispatch-timing/run-**'
 jobs:
   noop:
     runs-on: ubuntu-latest
