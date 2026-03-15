@@ -120,10 +120,10 @@ Use the following custom types:
 
 Allowed scopes are:
 
-- **config**: Changes to configuration files (e.g. workflow YAMLs, MCP config, etc.)
-- **repo**: Changes to repository-level files (e.g. README, CONTRIBUTING, .gitignore, etc.)
-- **design**: Changes to experiment design (e.g. branch structure, workflow triggers, etc.)
-- **exec**: Changes affecting experiment execution (e.g. workflow steps, action versions, etc.)
+- **config**: Changes to the configuration of either the repository or an experiment.
+- **repo**: Changes to the concept and framework of how to implement experiments in this repository.
+- **design**: Changes to an experiment's design, including hypotheses, metrics and analysis.
+- **exec**: Changes affecting experiment execution, including tools and implementation.
 
 Guidelines for scopes:
 
