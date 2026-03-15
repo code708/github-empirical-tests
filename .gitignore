@@ -4,3 +4,6 @@
 .vscode
 .idea
 .DS_Store
+
+# Experiment transient data (committed explicitly to main)
+trials/
