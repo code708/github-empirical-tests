@@ -1,0 +1,10 @@
+name: dispatch-timing-noop
+on:
+  push:
+    branches:
+      - 'workflow/dispatch-timing/**'
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "noop"
