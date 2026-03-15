@@ -131,7 +131,7 @@ size_to_bytes() {
 
 check_rate_limit() {
   local remaining
-  remaining=$(gh api -i /rate_limit 2>/dev/null | grep -i "x-ratelimit-remaining:" | awk '{print $2}' | tr -d '\r')
+  remaining=$(gh api /rate_limit 2>/dev/null | jq -r '.resources.core.remaining' 2>/dev/null)
   if [[ -n "$remaining" ]] && [[ "$remaining" -lt 100 ]]; then
     log "WARNING: Rate limit low — ${remaining} requests remaining"
     echo "WARNING: Rate limit low (${remaining} remaining), sleeping 60s" >&2

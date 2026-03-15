@@ -139,4 +139,3 @@ git branch --show-current                                   # Should be workflow
 ## Key Risks
 
 - Workflow YAML must exist on the pushed branch (not just `main`) — satisfied by our design
-- Rapid pushes may hit GitHub API rate limits — script checks `X-RateLimit-Remaining` and handles 403/429 gracefully
