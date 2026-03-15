@@ -77,10 +77,10 @@ else
 fi
 
 RUN_BRANCH="workflow/dispatch-timing/run-N=${SAMPLE_SIZE}"
-DATA_DIR="data"
-TIMESTAMP=$(python3 -c "import time; print(int(time.time()))")
-CSV_FILE="${DATA_DIR}/results_N=${SAMPLE_SIZE}.csv"
-LOG_FILE="${DATA_DIR}/run_N=${SAMPLE_SIZE}_${TIMESTAMP}_log.txt"
+RUNS_DIR="runs"
+PAYLOADS_DIR="${RUNS_DIR}/payloads"
+CSV_FILE="${RUNS_DIR}/N=${SAMPLE_SIZE}_results.csv"
+LOG_FILE="${RUNS_DIR}/N=${SAMPLE_SIZE}_log.txt"
 
 # ─── Helper functions ────────────────────────────────────────────────────────
 
@@ -197,15 +197,15 @@ create_trial_commit() {
   local size_bytes
   size_bytes=$(size_to_bytes "$size")
 
-  # Create/update files in a trial-specific directory
-  local trial_dir="trials/c${condition_num}_t${trial_num}"
+  # Create/update files in a trial-specific directory (gitignored payloads)
+  local trial_dir="${PAYLOADS_DIR}/c${condition_num}_t${trial_num}"
   mkdir -p "$trial_dir"
 
   for ((f = 1; f <= amount; f++)); do
     generate_content "$size_bytes" > "${trial_dir}/file_${f}.txt"
   done
 
-  git add "$trial_dir"
+  git add -f "$trial_dir"
   git commit -m "trial: condition=$condition_num trial=$trial_num amount=$amount size=$size" --quiet
 }
 
@@ -355,7 +355,7 @@ run_trial() {
 main() {
   preflight
 
-  mkdir -p "$DATA_DIR"
+  mkdir -p "$RUNS_DIR" "$PAYLOADS_DIR"
   : > "$LOG_FILE"
 
   local total_trials=$(( ${#CONDITIONS[@]} * SAMPLE_SIZE ))
@@ -393,13 +393,15 @@ main() {
 
   log "Experiment complete. Results: $CSV_FILE"
 
-  # Commit results to main branch
+  # Commit results CSV to main branch (log stays on run branch only)
   log "Committing results to $MAIN_BRANCH"
+  local csv_abs
+  csv_abs=$(realpath "$CSV_FILE")
   git checkout "$MAIN_BRANCH"
   git pull origin "$MAIN_BRANCH" --rebase --quiet 2>/dev/null || true
-  cp "$CSV_FILE" "$DATA_DIR/" 2>/dev/null || true
-  cp "$LOG_FILE" "$DATA_DIR/" 2>/dev/null || true
-  git add "$DATA_DIR"
+  mkdir -p "$RUNS_DIR"
+  cp "$csv_abs" "$RUNS_DIR/"
+  git add "$RUNS_DIR"
   git commit -m "test(exec): Add results for N=$SAMPLE_SIZE run" --quiet || true
   git push origin "$MAIN_BRANCH" --quiet 2>/dev/null || true
 
