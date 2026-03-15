@@ -1,0 +1,8 @@
+name: dispatch-timing-load
+on:
+  workflow_dispatch:
+jobs:
+  load:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "load" && sleep 60
