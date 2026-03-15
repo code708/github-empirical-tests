@@ -219,7 +219,7 @@ create_trial_commit() {
   done
 
   git add -f "$trial_dir"
-  git commit -m "trial: condition=$condition_num trial=$trial_num amount=$amount size=$size" --quiet
+  git -c commit.gpgsign=false commit -m "trial: condition=$condition_num trial=$trial_num amount=$amount size=$size" --quiet
 }
 
 poll_events_api() {
@@ -408,7 +408,7 @@ main() {
 
   # Commit log and CSV to the run branch
   git add -f "$CSV_FILE" "$LOG_FILE"
-  git commit -m "test(exec): Add run artifacts for N=$SAMPLE_SIZE" --quiet || true
+  git -c commit.gpgsign=false commit -m "test(exec): Add run artifacts for N=$SAMPLE_SIZE" --quiet || true
   git push origin "$RUN_BRANCH" --quiet 2>/dev/null || true
 
   # Commit results CSV to main branch (log stays on run branch only)
@@ -419,7 +419,7 @@ main() {
   mkdir -p "$RUNS_DIR"
   cp "$csv_abs" "$RUNS_DIR/"
   git add "$RUNS_DIR"
-  git commit -m "test(exec): Add results for N=$SAMPLE_SIZE run" --quiet || true
+  git -c commit.gpgsign=false commit -m "test(exec): Add results for N=$SAMPLE_SIZE run" --quiet || true
   git push origin "$MAIN_BRANCH" --quiet 2>/dev/null || true
 
   echo "Experiment complete. Results in $CSV_FILE, log in $LOG_FILE"
