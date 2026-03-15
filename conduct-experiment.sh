@@ -215,7 +215,7 @@ poll_events_api() {
 
   while [[ $(epoch_ms) -lt "$deadline" ]]; do
     local response
-    response=$(gh api "/repos/$OWNER/$REPO/events" --paginate 2>/dev/null || echo "[]")
+    response=$(gh api "/repos/$OWNER/$REPO/events?per_page=100" 2>/dev/null || echo "[]")
 
     local pushed_at
     pushed_at=$(echo "$response" | jq -r --arg sha "$sha" '
