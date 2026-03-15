@@ -27,12 +27,12 @@ This project currently relies on a [workaround](https://github.com/anthropics/cl
 
    ```json
    {
-   	"mcpServers": {
-   		"github": {
-   			"command": "sh",
-   			"args": ["-c", "GITHUB_PERSONAL_ACCESS_TOKEN=<MCP_LAUNCH_COMMAND>"]
-   		}
-   	}
+     "mcpServers": {
+       "github": {
+         "command": "sh",
+         "args": ["-c", "GITHUB_PERSONAL_ACCESS_TOKEN=<MCP_LAUNCH_COMMAND>"]
+       }
+     }
    }
    ```
 
@@ -58,17 +58,16 @@ This repo does not track issues.
 **Experiment branches** (verifying GitHub behaviors):
 
 - **`<use-case>/<experiment>/main`** (setup, execution and documentation) — permanent, branched from `main`, describes a particular experiment, serves as the execution target and result documentation.
-- **`<use-case>/<experiment>/*`** (auxiliary branches) — permanent, branched from `<experiment>/main`, created as needed by the experiment design, e.g. to observe  merge behavior.
+- **`<use-case>/<experiment>/*`** (auxiliary branches) — permanent, branched from `<experiment>/main`, created as needed by the experiment design, e.g. to observe merge behavior.
 
 ### Branch Protection Rules
-
 
 > `<use-case>` names are defined [below](#allowed-use-cases).  
 > `<experiment>` names can be chosen freely.
 
 - `main`: Direct pushes and force pushes allowed, renaming not allowed, deletion not allowed.
 - `<use-case>/<experiment>/main` and `<use-case>/<experiment>/*`: Developers may create branches,direct pushes and force pushes allowed, renaming allowed, deletion not allowed.
-- `*`: The creation of any branch not prefixed with an use case is prohibited. 
+- `*`: The creation of any branch not prefixed with an use case is prohibited.
 
 #### Allowed Use Cases
 
@@ -81,7 +80,7 @@ This repo does not track issues.
 
 ### Implementing a Repository Enhancement
 
-There is no formal process. Changes to the configuration and documentation on `main` can be made directly and without PRs. Since experiment branches keep an isolated scope of files, they can simply be rebased onto an updated `main` without conflict. 
+There is no formal process. Changes to the configuration and documentation on `main` can be made directly and without PRs. Since experiment branches keep an isolated scope of files, they can simply be rebased onto an updated `main` without conflict.
 
 ## Committing Changes
 
