@@ -53,7 +53,7 @@ This repo does not track issues.
 
 **Permanent branches:**
 
-- **`main`** (default branch) — the concept behind this repo, it's configurations and documentation is developed on this branch.
+- **`main`** (default branch) — the concept behind this repo, its configurations and documentation is developed on this branch.
 
 **Experiment branches** (verifying GitHub behaviors):
 
@@ -88,10 +88,6 @@ There is no formal process. Changes to the configuration and documentation on `m
 ### Scoping and Sizing Commits
 
 One commit should represent a single logical change. If possible keep changes scoped to a single domain or logical unit. Keep commits as small as possible, but as large as necessary. Write a conventional commit message for every commit.
-
-### Bumping the Version
-
-Do not update the version in `package.json` manually. A CI workflow automatically computes and bumps the version on PRs targeting `integration`, based on the commit types in the PR.
 
 ### Writing Commit Messages
 
