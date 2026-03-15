@@ -134,14 +134,10 @@ A single run (`./conduct-experiment.sh -n N`) executes all conditions sequential
 - If the branch already exists, it is reset to `workflow/dispatch-timing/main` and force-pushed
 - After a run completes, all artifacts (CSV, log, payloads) are committed to the run branch
 - The results CSV is then copied and committed to `workflow/dispatch-timing/main`
-- The run branch is a full record of the run; `main` is the source of truth for results
+- The run branch is a full record of the run; `workflow/dispatch-timing/main` is the source of truth for results
 
 ## CSV Schema
 
 ```
 condition,trial,commit_sha,amount,size,delay,concurrent,pushed_at_iso,pushed_at_epoch_ms,dispatched_at_iso,dispatched_at_epoch_ms,dispatch_delay_ms,run_id,run_status,timeout
 ```
-
-## Key Risks
-
-- Workflow YAML must exist on the pushed branch (not just `main`) — satisfied by our design
