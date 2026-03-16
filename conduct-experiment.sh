@@ -500,12 +500,15 @@ main() {
   git push origin "$RUN_BRANCH" --quiet 2>/dev/null || true
 
   # Commit results CSV to main branch (log stays on run branch only)
-  local csv_abs
-  csv_abs=$(realpath "$CSV_FILE")
+  # Copy CSV to a temp file before checkout — git removes tracked files when switching branches
+  local csv_tmp
+  csv_tmp=$(mktemp)
+  cp "$CSV_FILE" "$csv_tmp"
   git checkout "$MAIN_BRANCH"
   git pull origin "$MAIN_BRANCH" --rebase --quiet 2>/dev/null || true
   mkdir -p "$RUNS_DIR"
-  cp "$csv_abs" "$RUNS_DIR/"
+  cp "$csv_tmp" "$CSV_FILE"
+  rm -f "$csv_tmp"
   git add "$RUNS_DIR"
   git -c commit.gpgsign=false commit -m "test(exec): Add results for N=$SAMPLE_SIZE run" --quiet || true
   git push origin "$MAIN_BRANCH" --quiet 2>/dev/null || true
