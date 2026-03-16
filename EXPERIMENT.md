@@ -144,16 +144,12 @@ Script                              GitHub Actions Runners
 | 14  | large×5       | 5      | large  | -1          | 0          | Same as above                     |
 | 15  | large×10      | 10     | large  | -1          | 0          | Same as above                     |
 | 16  | large×50      | 50     | large  | -1          | 0          | Same as above                     |
-| 17  | medium×10+5c  | 10     | medium | -1          | 5          | Size+amount+load interaction      |
-| 18  | medium×10+10c | 10     | medium | -1          | 10         | Same as above                     |
-| 19  | medium×50+5c  | 50     | medium | -1          | 5          | Same as above                     |
-| 20  | medium×50+10c | 50     | medium | -1          | 10         | Same as above                     |
-| 21  | medium×10+1s  | 10     | medium | 1000        | 0          | Size+amount+frequency interaction |
-| 22  | medium×10+0s  | 10     | medium | 0           | 0          | Same as above                     |
-| 23  | medium×50+1s  | 50     | medium | 1000        | 0          | Same as above                     |
-| 24  | medium×50+0s  | 50     | medium | 0           | 0          | Same as above                     |
+| 17  | medium×10+1s  | 10     | medium | 1000        | 0          | Size+amount+frequency interaction |
+| 18  | medium×10+0s  | 10     | medium | 0           | 0          | Same as above                     |
+| 19  | medium×50+1s  | 50     | medium | 1000        | 0          | Same as above                     |
+| 20  | medium×50+0s  | 50     | medium | 0           | 0          | Same as above                     |
 
-**Total trials per run:** 24 conditions × N. With N=10: 240 trials. Runtime varies — sequential conditions wait for noop completion (~5–15s each), rapid conditions push back-to-back.
+**Total trials per run:** 20 conditions × N. With N=10: 160 trials. Runtime varies — sequential conditions wait for noop completion (~5–15s each), rapid conditions push back-to-back.
 
 ### Statistical Approach
 
