@@ -113,6 +113,8 @@ Use the following custom types:
 - **test**: A change affecting the experiment design and execution
 - **perf**: An improvement in experiment performance, not affecting design
 
+Do not use any other types.
+
 #### Scopes
 
 Allowed scopes are:
