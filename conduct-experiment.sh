@@ -222,7 +222,7 @@ setup_run_branch() {
 
 trigger_concurrent_load() {
   local count="$1"
-  local base_sleep="$SAMPLE_SIZE"
+  local base_sleep=$(( 3 * SAMPLE_SIZE + 2 * count ))
   log "Triggering $count concurrent load workflows (base sleep=${base_sleep}s)"
   for ((i = 1; i <= count; i++)); do
     local sleep_seconds=$(( base_sleep + count - i + 1 ))
