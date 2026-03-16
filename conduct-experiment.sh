@@ -244,6 +244,7 @@ create_trial_commit() {
   local size="$2"
   local condition_num="$3"
   local trial_num="$4"
+  local concurrent="$5"
   local size_bytes
   size_bytes=$(size_to_bytes "$size")
 
@@ -255,8 +256,17 @@ create_trial_commit() {
     generate_content "$size_bytes" > "${trial_dir}/file_${f}.txt"
   done
 
+  local unit="files"
+  if [[ "$amount" -eq 1 ]]; then
+    unit="file"
+  fi
+  local msg="[N=${SAMPLE_SIZE}] Cond#${condition_num} Trial#${trial_num} - ${amount} ${size} ${unit}"
+  if [[ "$concurrent" -gt 0 ]]; then
+    msg="${msg} [concurrent]"
+  fi
+
   git add -f "$trial_dir"
-  git -c commit.gpgsign=false commit -m "trial: condition=$condition_num trial=$trial_num amount=$amount size=$size" --quiet
+  git -c commit.gpgsign=false commit -m "$msg" --quiet
 }
 
 poll_events_api() {
@@ -328,7 +338,7 @@ run_trial() {
   fi
 
   # Create and push commit
-  create_trial_commit "$amount" "$size" "$condition_num" "$trial_num"
+  create_trial_commit "$amount" "$size" "$condition_num" "$trial_num" "$concurrent"
   local sha
   sha=$(git rev-parse HEAD)
 
