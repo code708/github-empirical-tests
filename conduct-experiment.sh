@@ -191,7 +191,7 @@ setup_auth() {
   PREV_CREDENTIAL_HELPER=$(git config --local credential.helper 2>/dev/null || true)
   git remote set-url origin "https://github.com/${OWNER}/${REPO}.git"
   git config --local credential.helper '!gh auth git-credential'
-  log "Configured PAT auth for git and gh CLI"
+  echo "Configured PAT auth for git and gh CLI"
 }
 
 restore_auth() {
@@ -206,7 +206,7 @@ restore_auth() {
 # ─── Branch setup ────────────────────────────────────────────────────────────
 
 setup_run_branch() {
-  log "Setting up run branch: $RUN_BRANCH"
+  echo "Setting up run branch: $RUN_BRANCH"
 
   git fetch origin "$MAIN_BRANCH" 2>/dev/null || true
 
@@ -218,7 +218,7 @@ setup_run_branch() {
   fi
 
   git push --force origin "$RUN_BRANCH"
-  log "Run branch ready: $RUN_BRANCH"
+  echo "Run branch ready: $RUN_BRANCH"
 }
 
 # ─── Concurrent load ────────────────────────────────────────────────────────
@@ -418,17 +418,17 @@ main() {
   setup_auth
   trap restore_auth EXIT
 
-  mkdir -p "$RUNS_DIR" "$PAYLOADS_DIR"
-  : > "$LOG_FILE"
-
   local total_trials=$(( ${#CONDITIONS[@]} * SAMPLE_SIZE ))
   echo "Dispatch timing experiment: ${#CONDITIONS[@]} conditions × $SAMPLE_SIZE trials = $total_trials total"
+
+  setup_run_branch
+
+  mkdir -p "$RUNS_DIR" "$PAYLOADS_DIR"
+  : > "$LOG_FILE"
 
   log "Starting experiment: N=$SAMPLE_SIZE, conditions=${#CONDITIONS[@]}, total_trials=$total_trials"
   log "Repository: $OWNER/$REPO"
   log "Run branch: $RUN_BRANCH"
-
-  setup_run_branch
 
   # Write CSV header
   echo "condition,trial,commit_sha,amount,size,delay,concurrent,pushed_at_iso,pushed_at_epoch_ms,dispatched_at_iso,dispatched_at_epoch_ms,dispatch_delay_ms,run_id,run_status,timeout" > "$CSV_FILE"
