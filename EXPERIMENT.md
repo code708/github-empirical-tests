@@ -91,7 +91,33 @@ A single run (`./conduct-experiment.sh -n N`) executes all conditions sequential
 - **amount**: Number of files changed per commit
 - **size**: File content size — `small` (~100B), `medium` (~10KB), `large` (~100KB)
 - **delay**: Inter-trial sleep in seconds
-- **concurrent**: Number of concurrent noop workflow runs triggered before the measured push
+- **concurrent**: Number of concurrent load workflow runs triggered before the measured push
+
+#### How Concurrent Load Works
+
+Concurrent conditions test whether GitHub Actions dispatches a push-triggered workflow slower when the runner queue is already busy. Before the trial push, the script fires N `workflow_dispatch` requests against the load workflow. Each load run sleeps for a dynamic duration: `(sample_size + 3) + i` seconds, where `i` is the dispatch index. This staggers their completion while ensuring they outlive the trial's push and poll cycle. After a 2-second pause for the load workflows to claim runners, the script pushes the trial commit and measures the noop workflow's dispatch latency as usual.
+
+```
+Script                              GitHub Actions Runners
+  │                                       (idle)
+  │
+  │─ POST /dispatches (load 1) ────→  load-1: sleep (N+3)+1
+  │─ POST /dispatches (load 2) ────→  load-2: sleep (N+3)+2
+  │─ POST /dispatches (load C) ────→  load-C: sleep (N+3)+C
+  │─ sleep 2  (let them claim runners)
+  │                                   C runners now busy sleeping
+  │
+  │─ git commit (trial payload)
+  │─ git push ─────────────────────→  PushEvent received by GitHub
+  │                                       │
+  │                                       ▼
+  │                                  noop workflow run created
+  │
+  │─ poll Events API ──→ pushed_at (T_pushed)
+  │─ poll Actions API ──→ dispatched_at (T_dispatched)
+  │
+  │─ dispatch_delay = T_dispatched - T_pushed
+```
 
 ### Single-Factor Conditions
 

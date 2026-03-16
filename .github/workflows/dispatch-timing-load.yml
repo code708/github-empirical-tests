@@ -1,8 +1,12 @@
 name: dispatch-timing-load
 on:
   workflow_dispatch:
+    inputs:
+      sleep_seconds:
+        required: true
+        type: number
 jobs:
   load:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "load" && sleep 60
+      - run: echo "load" && sleep ${{ inputs.sleep_seconds }}
