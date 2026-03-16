@@ -447,7 +447,6 @@ main() {
   git add -f "$CSV_FILE" "$LOG_FILE"
   git -c commit.gpgsign=false commit -m "test(exec): Add run artifacts for N=$SAMPLE_SIZE" --quiet || true
   git push origin "$RUN_BRANCH" --quiet 2>/dev/null || true
-  log "Pushed run artifacts to $RUN_BRANCH"
 
   # Commit results CSV to main branch (log stays on run branch only)
   local csv_abs
@@ -459,7 +458,6 @@ main() {
   git add "$RUNS_DIR"
   git -c commit.gpgsign=false commit -m "test(exec): Add results for N=$SAMPLE_SIZE run" --quiet || true
   git push origin "$MAIN_BRANCH" --quiet 2>/dev/null || true
-  log "Pushed results to $MAIN_BRANCH"
 
   echo "Experiment complete. Results in $CSV_FILE, log in $LOG_FILE"
 }
