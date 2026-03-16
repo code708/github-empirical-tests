@@ -1,0 +1,106 @@
+[2026-03-16 18:44:01] Starting experiment: N=1, conditions=20, total_trials=20
+[2026-03-16 18:44:01] Repository: code708/github-empirical-tests
+[2026-03-16 18:44:01] Run branch: workflow/dispatch-timing/run-N=1
+[2026-03-16 18:44:01] Condition 1/20: Baseline (amount=1 size=small push_pacing=-1ms concurrent=0)
+[2026-03-16 18:44:02]   Trial 1: amount=1 size=small push_pacing=-1ms concurrent=0
+[2026-03-16 18:44:04]   Pushed 5e742c3c300abce3eebef031fc4593b552b804ef
+[2026-03-16 18:44:09]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:44:09]   Waiting for run 23157767124 to complete
+[2026-03-16 18:44:13] Condition 2/20: Medium files (amount=1 size=medium push_pacing=-1ms concurrent=0)
+[2026-03-16 18:44:14]   Trial 1: amount=1 size=medium push_pacing=-1ms concurrent=0
+[2026-03-16 18:44:15]   Pushed d1a47f8955093cdf58210bf794d20b67931b6f1f
+[2026-03-16 18:44:20]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:44:20]   Waiting for run 23157775598 to complete
+[2026-03-16 18:44:25] Condition 3/20: Large files (amount=1 size=large push_pacing=-1ms concurrent=0)
+[2026-03-16 18:44:26]   Trial 1: amount=1 size=large push_pacing=-1ms concurrent=0
+[2026-03-16 18:44:28]   Pushed ddbf1509ca0fad17ca2a1f06d18d7ce7987b3942
+[2026-03-16 18:44:35]   Trial 1 complete: delay=3000ms timeout=false
+[2026-03-16 18:44:35]   Waiting for run 23157785745 to complete
+[2026-03-16 18:44:38] Condition 4/20: 5 files (amount=5 size=small push_pacing=-1ms concurrent=0)
+[2026-03-16 18:44:39]   Trial 1: amount=5 size=small push_pacing=-1ms concurrent=0
+[2026-03-16 18:44:41]   Pushed 72de09f3cd993fa5d07e1dedfb2c157a84eb6fc7
+[2026-03-16 18:44:48]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:44:48]   Waiting for run 23157794545 to complete
+[2026-03-16 18:44:52] Condition 5/20: 10 files (amount=10 size=small push_pacing=-1ms concurrent=0)
+[2026-03-16 18:44:53]   Trial 1: amount=10 size=small push_pacing=-1ms concurrent=0
+[2026-03-16 18:44:55]   Pushed e7c427ecf9bde2ba25099de7d410a1c132eafc62
+[2026-03-16 18:45:00]   Trial 1 complete: delay=1000ms timeout=false
+[2026-03-16 18:45:00]   Waiting for run 23157803645 to complete
+[2026-03-16 18:45:05] Condition 6/20: 50 files (amount=50 size=small push_pacing=-1ms concurrent=0)
+[2026-03-16 18:45:06]   Trial 1: amount=50 size=small push_pacing=-1ms concurrent=0
+[2026-03-16 18:45:09]   Pushed 54c99d1e19a364d3bb4d050f60b8fc4652735127
+[2026-03-16 18:45:15]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:45:15]   Waiting for run 23157814452 to complete
+[2026-03-16 18:45:20] Condition 7/20: 5 concurrent (amount=1 size=small push_pacing=-1ms concurrent=5)
+[2026-03-16 18:45:21]   Trial 1: amount=1 size=small push_pacing=-1ms concurrent=5
+[2026-03-16 18:45:21] Triggering 5 concurrent load workflows (base sleep=13s)
+[2026-03-16 18:45:33]   Pushed 9e5e3c9d360a091eb604a00d798d8eb1cc6714a5
+[2026-03-16 18:45:38]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:45:38]   Waiting for run 23157831257 to complete
+[2026-03-16 18:45:42] Condition 8/20: 10 concurrent (amount=1 size=small push_pacing=-1ms concurrent=10)
+[2026-03-16 18:45:43]   Trial 1: amount=1 size=small push_pacing=-1ms concurrent=10
+[2026-03-16 18:45:43] Triggering 10 concurrent load workflows (base sleep=23s)
+[2026-03-16 18:46:05]   Pushed 57a275ae9727597d3765e4f6311b8b2be33ac250
+[2026-03-16 18:46:10]   Trial 1 complete: delay=1000ms timeout=false
+[2026-03-16 18:46:10]   Waiting for run 23157853826 to complete
+[2026-03-16 18:46:17] Condition 9/20: Fast push (1s) (amount=1 size=small push_pacing=1000ms concurrent=0)
+[2026-03-16 18:46:17]   Trial 1: amount=1 size=small push_pacing=1000ms concurrent=0
+[2026-03-16 18:46:20]   Pushed 716db5f35a7fcf06c9e4f3dd3343d5633fd503cc
+[2026-03-16 18:46:25]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:46:26] Waiting for last run 23157864616 to complete before next condition
+[2026-03-16 18:46:31] Condition 10/20: Rapid push (0s) (amount=1 size=small push_pacing=0ms concurrent=0)
+[2026-03-16 18:46:32]   Trial 1: amount=1 size=small push_pacing=0ms concurrent=0
+[2026-03-16 18:46:34]   Pushed 70a02c8d0d11c39750da244e1cf95a678b12b84c
+[2026-03-16 18:46:38]   Trial 1 complete: delay=1000ms timeout=false
+[2026-03-16 18:46:38] Waiting for last run 23157873322 to complete before next condition
+[2026-03-16 18:46:41] Condition 11/20: medium×5 (amount=5 size=medium push_pacing=-1ms concurrent=0)
+[2026-03-16 18:46:42]   Trial 1: amount=5 size=medium push_pacing=-1ms concurrent=0
+[2026-03-16 18:46:44]   Pushed bd7d88c67cfa02f16c3226ae599cccbf43b0af4a
+[2026-03-16 18:46:49]   Trial 1 complete: delay=1000ms timeout=false
+[2026-03-16 18:46:49]   Waiting for run 23157880425 to complete
+[2026-03-16 18:46:53] Condition 12/20: medium×10 (amount=10 size=medium push_pacing=-1ms concurrent=0)
+[2026-03-16 18:46:54]   Trial 1: amount=10 size=medium push_pacing=-1ms concurrent=0
+[2026-03-16 18:46:56]   Pushed aa7aab21074326894890f4bbc09b7d53f43e15c1
+[2026-03-16 18:47:01]   Trial 1 complete: delay=1000ms timeout=false
+[2026-03-16 18:47:01]   Waiting for run 23157890659 to complete
+[2026-03-16 18:47:06] Condition 13/20: medium×50 (amount=50 size=medium push_pacing=-1ms concurrent=0)
+[2026-03-16 18:47:07]   Trial 1: amount=50 size=medium push_pacing=-1ms concurrent=0
+[2026-03-16 18:47:10]   Pushed 30c31c56308282956be63f3f9755ce28a253c609
+[2026-03-16 18:47:17]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:47:17]   Waiting for run 23157901707 to complete
+[2026-03-16 18:47:20] Condition 14/20: large×5 (amount=5 size=large push_pacing=-1ms concurrent=0)
+[2026-03-16 18:47:21]   Trial 1: amount=5 size=large push_pacing=-1ms concurrent=0
+[2026-03-16 18:47:23]   Pushed 2d718c83b28716361e4e256e143cfec5fe1966f4
+[2026-03-16 18:47:30]   Trial 1 complete: delay=1000ms timeout=false
+[2026-03-16 18:47:30]   Waiting for run 23157910951 to complete
+[2026-03-16 18:47:33] Condition 15/20: large×10 (amount=10 size=large push_pacing=-1ms concurrent=0)
+[2026-03-16 18:47:33]   Trial 1: amount=10 size=large push_pacing=-1ms concurrent=0
+[2026-03-16 18:47:36]   Pushed 21f948a81076fe929ba96d1bad650efa7f184e0d
+[2026-03-16 18:47:41]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:47:41]   Waiting for run 23157920312 to complete
+[2026-03-16 18:47:46] Condition 16/20: large×50 (amount=50 size=large push_pacing=-1ms concurrent=0)
+[2026-03-16 18:47:47]   Trial 1: amount=50 size=large push_pacing=-1ms concurrent=0
+[2026-03-16 18:47:53]   Pushed c7b02079ddc785dcc49b1c03854eedcbdf7e16c8
+[2026-03-16 18:47:58]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:47:58]   Waiting for run 23157931245 to complete
+[2026-03-16 18:48:07] Condition 17/20: medium×10+1s (amount=10 size=medium push_pacing=1000ms concurrent=0)
+[2026-03-16 18:48:07]   Trial 1: amount=10 size=medium push_pacing=1000ms concurrent=0
+[2026-03-16 18:48:10]   Pushed a303d5b3211d06cc4741d0fb1bc3f0fdee5707d8
+[2026-03-16 18:48:17]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:48:18] Waiting for last run 23157942952 to complete before next condition
+[2026-03-16 18:48:23] Condition 18/20: medium×10+0s (amount=10 size=medium push_pacing=0ms concurrent=0)
+[2026-03-16 18:48:23]   Trial 1: amount=10 size=medium push_pacing=0ms concurrent=0
+[2026-03-16 18:48:26]   Pushed d3c4ec2cb461aaa2593d3c8ece2755d6f0dcac2c
+[2026-03-16 18:48:33]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:48:33] Waiting for last run 23157954023 to complete before next condition
+[2026-03-16 18:48:38] Condition 19/20: medium×50+1s (amount=50 size=medium push_pacing=1000ms concurrent=0)
+[2026-03-16 18:48:39]   Trial 1: amount=50 size=medium push_pacing=1000ms concurrent=0
+[2026-03-16 18:48:43]   Pushed 55f0df688dab33aa3b9f668ee8756c093fc5538a
+[2026-03-16 18:48:48]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:48:49] Waiting for last run 23157964641 to complete before next condition
+[2026-03-16 18:48:52] Condition 20/20: medium×50+0s (amount=50 size=medium push_pacing=0ms concurrent=0)
+[2026-03-16 18:48:53]   Trial 1: amount=50 size=medium push_pacing=0ms concurrent=0
+[2026-03-16 18:48:59]   Pushed e187be65c607b2652310390d9cce4933e311acca
+[2026-03-16 18:49:04]   Trial 1 complete: delay=2000ms timeout=false
+[2026-03-16 18:49:04] Waiting for last run 23157976548 to complete before next condition
+[2026-03-16 18:49:11] Experiment complete. Results: runs/N=1_results.csv
