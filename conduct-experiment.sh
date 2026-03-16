@@ -230,8 +230,8 @@ trigger_concurrent_load() {
   for ((i = 1; i <= count; i++)); do
     local sleep_seconds=$(( base_sleep + i ))
     gh api -X POST "/repos/$OWNER/$REPO/actions/workflows/dispatch-timing-load.yml/dispatches" \
-      -f ref="$RUN_BRANCH" \
-      -f "inputs[sleep_seconds]=$sleep_seconds" 2>/dev/null || log "WARNING: Failed to trigger load workflow $i"
+      --raw-field ref="$RUN_BRANCH" \
+      --raw-field "inputs={\"sleep_seconds\":\"$sleep_seconds\"}" 2>/dev/null || log "WARNING: Failed to trigger load workflow $i"
   done
   # Brief pause to let workflows start
   sleep 2
