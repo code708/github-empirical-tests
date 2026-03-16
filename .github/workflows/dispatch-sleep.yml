@@ -1,0 +1,12 @@
+name: dispatch-sleep
+on:
+  workflow_dispatch:
+    inputs:
+      sleep_seconds:
+        required: true
+        type: number
+jobs:
+  load:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Pretending to work" && sleep ${{ inputs.sleep_seconds }}
