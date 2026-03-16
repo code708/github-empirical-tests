@@ -156,6 +156,7 @@ Guidelines for the body:
 - **Be concise** — A few sentences typically suffice; use bullet points only for multiple related changes
 - **One concern per paragraph** — Group related points; separate unrelated ones with blank lines
 - **Reason and effect** - Start each concern with a brief reason for the change, followed by the effect or value of that change
+- **Avoid technical explanations** - Stick to higher level descriptions and explanations; only mention a technical detail if it's crucial for understanding the reason or effect
 - **Separate reason and effect** - Use a line with a single basic arrow down character (UTF-8 `U+2193`) to visually separate the reason from the effect/value
 - **Past tense for reasons** - Either note the state or behavior before the change, or new requirements, regulations or rules that make the change necessary, using past tense ("was", "had", "required", etc.)
 - **Imperative mood for effects** — Use "Add support for..." not "Added..." or "Adds..."
