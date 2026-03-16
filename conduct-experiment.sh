@@ -266,7 +266,7 @@ poll_events_api() {
 
     local pushed_at
     pushed_at=$(echo "$response" | jq -r --arg sha "$sha" '
-      [.[] | select(.type == "PushEvent" and (.payload.commits // [] | any(.sha == $sha)))]
+      [.[] | select(.type == "PushEvent" and .payload.head == $sha)]
       | first | .created_at // empty
     ' 2>/dev/null || true)
 
