@@ -182,18 +182,25 @@ preflight() {
   fi
 }
 
-# ─── Push URL setup ──────────────────────────────────────────────────────────
+# ─── Auth setup ───────────────────────────────────────────────────────────────
 
-setup_push_url() {
+setup_auth() {
   local token
   token=$(get_token) || { echo "Error: get_token failed. Check gh-auth.sh" >&2; exit 1; }
-  local https_url="https://x-access-token:${token}@github.com/${OWNER}/${REPO}.git"
-  git remote set-url --push origin "$https_url"
-  log "Configured HTTPS push URL"
+  export GH_TOKEN="$token"
+  PREV_CREDENTIAL_HELPER=$(git config --local credential.helper 2>/dev/null || true)
+  git remote set-url origin "https://github.com/${OWNER}/${REPO}.git"
+  git config --local credential.helper '!gh auth git-credential'
+  log "Configured PAT auth for git and gh CLI"
 }
 
-restore_push_url() {
-  git remote set-url --push origin "$REMOTE_URL"
+restore_auth() {
+  git remote set-url origin "$REMOTE_URL"
+  if [[ -n "$PREV_CREDENTIAL_HELPER" ]]; then
+    git config --local credential.helper "$PREV_CREDENTIAL_HELPER"
+  else
+    git config --local --unset credential.helper 2>/dev/null || true
+  fi
 }
 
 # ─── Branch setup ────────────────────────────────────────────────────────────
@@ -395,8 +402,8 @@ run_trial() {
 
 main() {
   preflight
-  setup_push_url
-  trap restore_push_url EXIT
+  setup_auth
+  trap restore_auth EXIT
 
   mkdir -p "$RUNS_DIR" "$PAYLOADS_DIR"
   : > "$LOG_FILE"
