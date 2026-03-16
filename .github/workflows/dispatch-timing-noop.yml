@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - 'workflow/dispatch-timing/run-**'
+    paths:
+      - 'runs/payloads/**'
 jobs:
   noop:
     runs-on: ubuntu-latest
