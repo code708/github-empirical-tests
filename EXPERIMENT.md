@@ -76,7 +76,7 @@ Since both timestamps originate from GitHub's servers, the measurement is free o
    - **Events API**: `GET /repos/{owner}/{repo}/events` → find `PushEvent` matching commit SHA → extract `T_pushed` (`created_at`)
    - **Actions API**: `GET /repos/{owner}/{repo}/actions/runs?head_sha={SHA}` → find workflow run → extract `T_dispatched` (`created_at`)
 4. Compute dispatch delay, append row to CSV
-5. Sleep inter-trial delay before next trial
+5. If sequential (`push_pacing == -1`): wait for noop run to complete. If rapid (`push_pacing >= 0`): sleep `push_pacing` ms (or skip if 0). After the last trial of every condition, wait for the noop run to complete before proceeding.
 
 ### Rate Limit Safety
 
@@ -90,7 +90,7 @@ A single run (`./conduct-experiment.sh -n N`) executes all conditions sequential
 
 - **amount**: Number of files changed per commit
 - **size**: File content size — `small` (~100B), `medium` (~10KB), `large` (~100KB)
-- **delay**: Inter-trial sleep in seconds
+- **push_pacing**: Controls inter-trial timing — `-1` = sequential (wait for noop run to complete between trials), `≥0` = rapid (sleep this many milliseconds between trials, wait only after the last trial)
 - **concurrent**: Number of concurrent load workflow runs triggered before the measured push
 
 #### How Concurrent Load Works
@@ -121,39 +121,39 @@ Script                              GitHub Actions Runners
 
 ### Single-Factor Conditions
 
-| #   | Condition       | amount | size   | delay | concurrent | Hypothesis                                                     |
-| --- | --------------- | ------ | ------ | ----- | ---------- | -------------------------------------------------------------- |
-| 1   | Baseline        | 1      | small  | 5s    | 0          | Reference distribution                                         |
-| 2   | Medium files    | 1      | medium | 5s    | 0          | Minimal effect — GitHub decouples webhooks from object storage |
-| 3   | Large files     | 1      | large  | 5s    | 0          | Same as above                                                  |
-| 4   | 5 files         | 5      | small  | 5s    | 0          | More files per commit shouldn't affect dispatch                |
-| 5   | 10 files        | 10     | small  | 5s    | 0          | Same as above                                                  |
-| 6   | 50 files        | 50     | small  | 5s    | 0          | Same as above                                                  |
-| 7   | 5 concurrent    | 1      | small  | 5s    | 5          | Per-repo queuing may delay dispatch                            |
-| 8   | 10 concurrent   | 1      | small  | 5s    | 10         | Same as above                                                  |
-| 9   | Fast push (1s)  | 1      | small  | 1s    | 0          | Rapid pushes may queue, increasing delay                       |
-| 10  | Rapid push (0s) | 1      | small  | 0s    | 0          | Same as above                                                  |
+| #   | Condition       | amount | size   | push_pacing | concurrent | Hypothesis                                                     |
+| --- | --------------- | ------ | ------ | ----------- | ---------- | -------------------------------------------------------------- |
+| 1   | Baseline        | 1      | small  | -1          | 0          | Reference distribution                                         |
+| 2   | Medium files    | 1      | medium | -1          | 0          | Minimal effect — GitHub decouples webhooks from object storage |
+| 3   | Large files     | 1      | large  | -1          | 0          | Same as above                                                  |
+| 4   | 5 files         | 5      | small  | -1          | 0          | More files per commit shouldn't affect dispatch                |
+| 5   | 10 files        | 10     | small  | -1          | 0          | Same as above                                                  |
+| 6   | 50 files        | 50     | small  | -1          | 0          | Same as above                                                  |
+| 7   | 5 concurrent    | 1      | small  | -1          | 5          | Per-repo queuing may delay dispatch                            |
+| 8   | 10 concurrent   | 1      | small  | -1          | 10         | Same as above                                                  |
+| 9   | Fast push (1s)  | 1      | small  | 1000        | 0          | Rapid pushes may queue, increasing delay                       |
+| 10  | Rapid push (0s) | 1      | small  | 0           | 0          | Same as above                                                  |
 
 ### Multi-Factorial Conditions
 
-| #   | Condition     | amount | size   | delay | concurrent | Hypothesis                        |
-| --- | ------------- | ------ | ------ | ----- | ---------- | --------------------------------- |
-| 11  | medium×5      | 5      | medium | 10s   | 0          | Combined size+amount effect       |
-| 12  | medium×10     | 10     | medium | 10s   | 0          | Same as above                     |
-| 13  | medium×50     | 50     | medium | 10s   | 0          | Same as above                     |
-| 14  | large×5       | 5      | large  | 10s   | 0          | Same as above                     |
-| 15  | large×10      | 10     | large  | 10s   | 0          | Same as above                     |
-| 16  | large×50      | 50     | large  | 10s   | 0          | Same as above                     |
-| 17  | medium×10+5c  | 10     | medium | 10s   | 5          | Size+amount+load interaction      |
-| 18  | medium×10+10c | 10     | medium | 10s   | 10         | Same as above                     |
-| 19  | medium×50+5c  | 50     | medium | 10s   | 5          | Same as above                     |
-| 20  | medium×50+10c | 50     | medium | 10s   | 10         | Same as above                     |
-| 21  | medium×10+1s  | 10     | medium | 1s    | 0          | Size+amount+frequency interaction |
-| 22  | medium×10+0s  | 10     | medium | 0s    | 0          | Same as above                     |
-| 23  | medium×50+1s  | 50     | medium | 1s    | 0          | Same as above                     |
-| 24  | medium×50+0s  | 50     | medium | 0s    | 0          | Same as above                     |
+| #   | Condition     | amount | size   | push_pacing | concurrent | Hypothesis                        |
+| --- | ------------- | ------ | ------ | ----------- | ---------- | --------------------------------- |
+| 11  | medium×5      | 5      | medium | -1          | 0          | Combined size+amount effect       |
+| 12  | medium×10     | 10     | medium | -1          | 0          | Same as above                     |
+| 13  | medium×50     | 50     | medium | -1          | 0          | Same as above                     |
+| 14  | large×5       | 5      | large  | -1          | 0          | Same as above                     |
+| 15  | large×10      | 10     | large  | -1          | 0          | Same as above                     |
+| 16  | large×50      | 50     | large  | -1          | 0          | Same as above                     |
+| 17  | medium×10+5c  | 10     | medium | -1          | 5          | Size+amount+load interaction      |
+| 18  | medium×10+10c | 10     | medium | -1          | 10         | Same as above                     |
+| 19  | medium×50+5c  | 50     | medium | -1          | 5          | Same as above                     |
+| 20  | medium×50+10c | 50     | medium | -1          | 10         | Same as above                     |
+| 21  | medium×10+1s  | 10     | medium | 1000        | 0          | Size+amount+frequency interaction |
+| 22  | medium×10+0s  | 10     | medium | 0           | 0          | Same as above                     |
+| 23  | medium×50+1s  | 50     | medium | 1000        | 0          | Same as above                     |
+| 24  | medium×50+0s  | 50     | medium | 0           | 0          | Same as above                     |
 
-**Total trials per run:** 24 conditions × N. With N=10: 240 trials, ~50 min runtime.
+**Total trials per run:** 24 conditions × N. With N=10: 240 trials. Runtime varies — sequential conditions wait for noop completion (~5–15s each), rapid conditions push back-to-back.
 
 ### Statistical Approach
 
@@ -173,5 +173,5 @@ Script                              GitHub Actions Runners
 ## CSV Schema
 
 ```
-condition,trial,commit_sha,amount,size,delay,concurrent,pushed_at_iso,pushed_at_epoch_ms,dispatched_at_iso,dispatched_at_epoch_ms,dispatch_delay_ms,run_id,run_status,timeout
+condition,trial,commit_sha,amount,size,push_pacing,concurrent,pushed_at_iso,pushed_at_epoch_ms,dispatched_at_iso,dispatched_at_epoch_ms,dispatch_delay_ms,run_id,run_status,timeout
 ```

@@ -16,8 +16,7 @@ source "$AUTH_SCRIPT"
 
 MAIN_BRANCH="workflow/dispatch-timing/main"
 POLL_INTERVAL=1        # seconds between API polls
-POLL_TIMEOUT=120       # seconds before declaring a trial timed out
-INTER_CONDITION_DELAY=10  # seconds between conditions
+POLL_TIMEOUT=90        # seconds before declaring a trial / run-completion timed out
 DEFAULT_SAMPLE_SIZE=10
 
 SMALL_SIZE=100         # bytes
@@ -25,32 +24,34 @@ MEDIUM_SIZE=10000      # bytes
 LARGE_SIZE=100000      # bytes
 
 # ─── Condition table ─────────────────────────────────────────────────────────
-# Format: "name|amount|size|delay|concurrent"
+# Format: "name|amount|size|push_pacing|concurrent"
+# push_pacing: -1 = sequential (wait for noop completion between trials)
+#              ≥0 = rapid (sleep this many ms between trials, wait only after last)
 
 CONDITIONS=(
-  "Baseline|1|small|5|0"
-  "Medium files|1|medium|5|0"
-  "Large files|1|large|5|0"
-  "5 files|5|small|5|0"
-  "10 files|10|small|5|0"
-  "50 files|50|small|5|0"
-  "5 concurrent|1|small|5|5"
-  "10 concurrent|1|small|5|10"
-  "Fast push (1s)|1|small|1|0"
+  "Baseline|1|small|-1|0"
+  "Medium files|1|medium|-1|0"
+  "Large files|1|large|-1|0"
+  "5 files|5|small|-1|0"
+  "10 files|10|small|-1|0"
+  "50 files|50|small|-1|0"
+  "5 concurrent|1|small|-1|5"
+  "10 concurrent|1|small|-1|10"
+  "Fast push (1s)|1|small|1000|0"
   "Rapid push (0s)|1|small|0|0"
-  "medium×5|5|medium|10|0"
-  "medium×10|10|medium|10|0"
-  "medium×50|50|medium|10|0"
-  "large×5|5|large|10|0"
-  "large×10|10|large|10|0"
-  "large×50|50|large|10|0"
-  "medium×10+5c|10|medium|10|5"
-  "medium×10+10c|10|medium|10|10"
-  "medium×50+5c|50|medium|10|5"
-  "medium×50+10c|50|medium|10|10"
-  "medium×10+1s|10|medium|1|0"
+  "medium×5|5|medium|-1|0"
+  "medium×10|10|medium|-1|0"
+  "medium×50|50|medium|-1|0"
+  "large×5|5|large|-1|0"
+  "large×10|10|large|-1|0"
+  "large×50|50|large|-1|0"
+  "medium×10+5c|10|medium|-1|5"
+  "medium×10+10c|10|medium|-1|10"
+  "medium×50+5c|50|medium|-1|5"
+  "medium×50+10c|50|medium|-1|10"
+  "medium×10+1s|10|medium|1000|0"
   "medium×10+0s|10|medium|0|0"
-  "medium×50+1s|50|medium|1|0"
+  "medium×50+1s|50|medium|1000|0"
   "medium×50+0s|50|medium|0|0"
 )
 
@@ -321,16 +322,35 @@ poll_actions_api() {
   return 1
 }
 
+wait_for_run_completion() {
+  local run_id="$1"
+  local deadline=$(( $(epoch_ms) + POLL_TIMEOUT * 1000 ))
+
+  while [[ $(epoch_ms) -lt "$deadline" ]]; do
+    local status
+    status=$(gh api "/repos/$OWNER/$REPO/actions/runs/$run_id" 2>/dev/null \
+      | jq -r '.status' 2>/dev/null || true)
+
+    if [[ "$status" == "completed" ]]; then
+      return 0
+    fi
+
+    sleep "$POLL_INTERVAL"
+  done
+
+  return 1
+}
+
 run_trial() {
   local condition_num="$1"
   local condition_name="$2"
   local trial_num="$3"
   local amount="$4"
   local size="$5"
-  local delay="$6"
+  local push_pacing="$6"
   local concurrent="$7"
 
-  log "  Trial $trial_num: amount=$amount size=$size delay=${delay}s concurrent=$concurrent"
+  log "  Trial $trial_num: amount=$amount size=$size push_pacing=${push_pacing}ms concurrent=$concurrent"
 
   # Trigger concurrent load if needed
   if [[ "$concurrent" -gt 0 ]]; then
@@ -401,14 +421,30 @@ run_trial() {
   fi
 
   # Append CSV row
-  echo "${condition_num},${trial_num},${sha},${amount},${size},${delay},${concurrent},${pushed_at_iso},${pushed_at_epoch_ms},${dispatched_at_iso},${dispatched_at_epoch_ms},${dispatch_delay_ms},${run_id},${run_status},${timed_out}" >> "$CSV_FILE"
+  echo "${condition_num},${trial_num},${sha},${amount},${size},${push_pacing},${concurrent},${pushed_at_iso},${pushed_at_epoch_ms},${dispatched_at_iso},${dispatched_at_epoch_ms},${dispatch_delay_ms},${run_id},${run_status},${timed_out}" >> "$CSV_FILE"
 
   log "  Trial $trial_num complete: delay=${dispatch_delay_ms}ms timeout=${timed_out}"
 
-  # Inter-trial delay
-  if [[ "$delay" -gt 0 ]]; then
-    sleep "$delay"
+  # Export run_id so caller can wait for the last trial's completion
+  LAST_RUN_ID="$run_id"
+
+  # Inter-trial pacing
+  if [[ "$push_pacing" -eq -1 ]]; then
+    # Sequential: wait for this trial's noop run to complete
+    if [[ -n "$run_id" ]]; then
+      log "  Waiting for run $run_id to complete"
+      if ! wait_for_run_completion "$run_id"; then
+        log "  WARNING: Run $run_id did not complete within ${POLL_TIMEOUT}s, falling back to sleep 10"
+        sleep 10
+      fi
+    else
+      log "  WARNING: No run_id (trial likely timed out after ${POLL_TIMEOUT}s), skipping wait"
+    fi
+  elif [[ "$push_pacing" -gt 0 ]]; then
+    # Rapid with pacing: sleep push_pacing milliseconds
+    sleep "$(awk "BEGIN{print $push_pacing/1000}")"
   fi
+  # push_pacing == 0: no sleep between trials
 }
 
 # ─── Main ────────────────────────────────────────────────────────────────────
@@ -431,26 +467,31 @@ main() {
   log "Run branch: $RUN_BRANCH"
 
   # Write CSV header
-  echo "condition,trial,commit_sha,amount,size,delay,concurrent,pushed_at_iso,pushed_at_epoch_ms,dispatched_at_iso,dispatched_at_epoch_ms,dispatch_delay_ms,run_id,run_status,timeout" > "$CSV_FILE"
+  echo "condition,trial,commit_sha,amount,size,push_pacing,concurrent,pushed_at_iso,pushed_at_epoch_ms,dispatched_at_iso,dispatched_at_epoch_ms,dispatch_delay_ms,run_id,run_status,timeout" > "$CSV_FILE"
 
   local condition_num=0
   for cond in "${CONDITIONS[@]}"; do
     condition_num=$((condition_num + 1))
 
-    IFS='|' read -r name amount size delay concurrent <<< "$cond"
+    IFS='|' read -r name amount size push_pacing concurrent <<< "$cond"
 
-    log "Condition $condition_num/$((${#CONDITIONS[@]})): $name (amount=$amount size=$size delay=${delay}s concurrent=$concurrent)"
+    log "Condition $condition_num/$((${#CONDITIONS[@]})): $name (amount=$amount size=$size push_pacing=${push_pacing}ms concurrent=$concurrent)"
 
     check_rate_limit
 
+    # LAST_RUN_ID is set by run_trial as a global side-effect (bash idiom for multi-value return)
+    LAST_RUN_ID=""
     for ((trial = 1; trial <= SAMPLE_SIZE; trial++)); do
-      run_trial "$condition_num" "$name" "$trial" "$amount" "$size" "$delay" "$concurrent"
+      run_trial "$condition_num" "$name" "$trial" "$amount" "$size" "$push_pacing" "$concurrent"
     done
 
-    # Pause between conditions
-    if [[ "$condition_num" -lt "${#CONDITIONS[@]}" ]]; then
-      log "Sleeping ${INTER_CONDITION_DELAY}s between conditions"
-      sleep "$INTER_CONDITION_DELAY"
+    # For rapid conditions, wait for the last trial's noop run to complete before next condition.
+    # Sequential conditions (push_pacing=-1) already wait inside run_trial, so skip to avoid a redundant API call.
+    if [[ "$push_pacing" -ne -1 ]] && [[ -n "$LAST_RUN_ID" ]]; then
+      log "Waiting for last run $LAST_RUN_ID to complete before next condition"
+      if ! wait_for_run_completion "$LAST_RUN_ID"; then
+        log "WARNING: Last run $LAST_RUN_ID did not complete within ${POLL_TIMEOUT}s"
+      fi
     fi
   done
 
