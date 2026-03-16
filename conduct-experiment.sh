@@ -226,14 +226,14 @@ setup_run_branch() {
 
 trigger_concurrent_load() {
   local count="$1"
-  local base_sleep=$(( SAMPLE_SIZE + 3 ))
+  local base_sleep="$SAMPLE_SIZE"
   log "Triggering $count concurrent load workflows (base sleep=${base_sleep}s)"
   for ((i = 1; i <= count; i++)); do
-    local sleep_seconds=$(( base_sleep + i ))
+    local sleep_seconds=$(( base_sleep + count - i + 1 ))
     jq -n --arg ref "$RUN_BRANCH" --arg secs "$sleep_seconds" \
       '{ref: $ref, inputs: {sleep_seconds: $secs}}' \
     | gh api -X POST "/repos/$OWNER/$REPO/actions/workflows/dispatch-sleep.yml/dispatches" \
-      --input - 2>/dev/null || log "WARNING: Failed to trigger load workflow $i"
+      --input - > /dev/null 2>&1 || log "WARNING: Failed to trigger load workflow $i"
   done
   # Brief pause to let workflows start
   sleep 2

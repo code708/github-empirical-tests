@@ -95,15 +95,15 @@ A single run (`./conduct-experiment.sh -n N`) executes all conditions sequential
 
 #### How Concurrent Load Works
 
-Concurrent conditions test whether GitHub Actions dispatches a push-triggered workflow slower when the runner queue is already busy. Before the trial push, the script fires N `workflow_dispatch` requests against the load workflow. Each load run sleeps for a dynamic duration: `(sample_size + 3) + i` seconds, where `i` is the dispatch index. This staggers their completion while ensuring they outlive the trial's push and poll cycle. After a 2-second pause for the load workflows to claim runners, the script pushes the trial commit and measures the noop workflow's dispatch latency as usual.
+Concurrent conditions test whether GitHub Actions dispatches a push-triggered workflow slower when the runner queue is already busy. Before the trial push, the script fires N `workflow_dispatch` requests against the load workflow. Each load run sleeps for a decreasing duration: `sample_size + count - i + 1` seconds, where `i` is the dispatch index. The first-dispatched workflow sleeps longest, keeping all runners busy throughout. This staggers their completion while ensuring they outlive the trial's push and poll cycle. After a 2-second pause for the load workflows to claim runners, the script pushes the trial commit and measures the noop workflow's dispatch latency as usual.
 
 ```
 Script                              GitHub Actions Runners
   │                                       (idle)
   │
-  │─ POST /dispatches (load 1) ────→  load-1: sleep (N+3)+1
-  │─ POST /dispatches (load 2) ────→  load-2: sleep (N+3)+2
-  │─ POST /dispatches (load C) ────→  load-C: sleep (N+3)+C
+  │─ POST /dispatches (load 1) ────→  load-1: sleep N+C
+  │─ POST /dispatches (load 2) ────→  load-2: sleep N+C-1
+  │─ POST /dispatches (load C) ────→  load-C: sleep N+1
   │─ sleep 2  (let them claim runners)
   │                                   C runners now busy sleeping
   │
