@@ -152,8 +152,11 @@ Guidelines for the body:
 - **Explain why, not what** — The diff shows what changed; explain the reasoning, context, or problem being solved
 - **Wrap at 80 characters** — Wrap lines so they don't exceed 80 characters, but don't cut words, unless it's longer than 80 characters itself
 - **Be concise** — A few sentences typically suffice; use bullet points only for multiple related changes
-- **Imperative mood** — Use "Add support for..." not "Added..." or "Adds..."
 - **One concern per paragraph** — Group related points; separate unrelated ones with blank lines
+- **Reason and effect** - Start each concern with a brief reason for the change, followed by the effect or value of that change
+- **Separate reason and effect** - Use a line with a single basic arrow down character (UTF-8 `U+2193`) to visually separate the reason from the effect/value
+- **Past tense for reasons** - Either note the state or behavior before the change, or new requirements, regulations or rules that make the change necessary, using past tense ("was", "had", "required", etc.)
+- **Imperative mood for effects** — Use "Add support for..." not "Added..." or "Adds..."
 
 #### Footers
 
