@@ -232,7 +232,7 @@ trigger_concurrent_load() {
     local sleep_seconds=$(( base_sleep + i ))
     jq -n --arg ref "$RUN_BRANCH" --arg secs "$sleep_seconds" \
       '{ref: $ref, inputs: {sleep_seconds: $secs}}' \
-    | gh api -X POST "/repos/$OWNER/$REPO/actions/workflows/dispatch-timing-load.yml/dispatches" \
+    | gh api -X POST "/repos/$OWNER/$REPO/actions/workflows/dispatch-sleep.yml/dispatches" \
       --input - 2>/dev/null || log "WARNING: Failed to trigger load workflow $i"
   done
   # Brief pause to let workflows start
