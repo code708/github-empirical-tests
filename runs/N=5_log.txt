@@ -1,0 +1,4 @@
+[2026-03-15 19:03:46] Starting experiment: N=5, conditions=24, total_trials=120
+[2026-03-15 19:03:46] Repository: code708/github-empirical-tests
+[2026-03-15 19:03:46] Run branch: workflow/dispatch-timing/run-N=5
+[2026-03-15 19:03:46] Setting up run branch: workflow/dispatch-timing/run-N=5
