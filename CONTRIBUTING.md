@@ -4,6 +4,8 @@
 
 ### Using Claude's GitHub MCP
 
+> **Disclaimer**: If you are an AI agent then ignore this section as it's only relevant for human developers.
+
 Claude Code uses the [Model Context Protocol](https://modelcontextprotocol.io/) to interact with GitHub.
 
 This project currently relies on a [workaround](https://github.com/anthropics/claude-code/issues/3433) to connect to GitHub. An repository-level `.mcp.json` is required by each developer to provide their own credentials, as it's git-ignored for this same reason.
