@@ -127,3 +127,4 @@ For each merge queue entry, check:
 
 - The polling step in CI is the key mechanism that ensures the version bump has landed before CI completes. Without it, the merge queue might merge the next PR before the bump is pushed.
 - If rejected, alternative approaches: use a PAT instead of GITHUB_TOKEN, use GitHub App token, or combine version bump into the merge queue's CI check itself.
+- In real usage, not every PR requires a version bump. The poll step handles this via a condition that determines whether a bump is expected for the current merge — if not, it skips waiting and CI proceeds immediately. This experiment only tests the waiting path; the skip path is a straightforward conditional that doesn't require empirical validation.
