@@ -40,7 +40,14 @@ create_pr() {
 wait_for_ci() {
   local pr=$1
   log "Waiting for CI on ${pr}"
-  until gh pr checks "${pr}" --repo "${REPO}" --watch 2>/dev/null; do
+
+  while true; do
+    STATUS=$(gh pr checks "${pr}" --repo "${REPO}" --json state --jq '.[].state' 2>/dev/null || echo "PENDING")
+    case "$STATUS" in
+      SUCCESS) break ;;
+      FAILURE) log "CI failed on ${pr}"; return 1 ;;
+    esac
+
     sleep 2
   done
   log "CI passed on ${pr}"
