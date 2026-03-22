@@ -1,5 +1,6 @@
 .claude
 .mcp.json
+gh-auth.sh
 
 .vscode
 .idea
