@@ -123,6 +123,24 @@ For each merge queue entry, check:
 - **Partially confirmed:** History is correct but only because the merge queue naturally waited long enough (no invalidation observed). This means it works but is timing-dependent.
 - **Rejected:** PRs merge without the intervening bump, VERSION values are wrong or duplicated, or version-bump pushes fail (non-fast-forward).
 
+## Running the experiment
+
+### Prerequisites
+
+1. **`gh` CLI** authenticated with a token that has `repo` scope (needed to create branches, push files, create/merge PRs, and read workflow runs)
+2. **Branch protection** configured on `merge-queue/wait-for-post-merge-workflow-to-finish/run` as described in [Branch protection](#branch-protection-on-the-experiments-integration-branch) — the script creates the branch if it doesn't exist, but protection rules and merge queue must be set up manually first
+3. **Workflows** (`ci.yml`, `version-bump.yml`) and `VERSION` committed to the experiment's main branch — the `/run` branch is reset to this branch at the start of each run
+
+### Execution
+
+```sh
+./conduct-experiment.sh
+```
+
+The script is idempotent — it resets the `/run` branch and cleans up PR branches before each run. It operates entirely via the GitHub API; no local branch switches occur.
+
+Progress is logged to stderr. On completion, a results file is pushed to `runs/<timestamp>.md` on the experiment's main branch.
+
 ## Notes
 
 - The polling step in CI is the key mechanism that ensures the version bump has landed before CI completes. Without it, the merge queue might merge the next PR before the bump is pushed.
