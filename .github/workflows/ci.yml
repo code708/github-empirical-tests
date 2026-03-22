@@ -1,0 +1,60 @@
+name: ci
+on:
+  pull_request:
+    branches:
+      - merge-queue/wait-for-post-merge-workflow-to-finish/run
+  merge_group:
+    branches:
+      - merge-queue/wait-for-post-merge-workflow-to-finish/run
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Print VERSION and HEAD SHA
+        run: |
+          echo "VERSION: $(cat VERSION)"
+          echo "HEAD SHA: $(git rev-parse HEAD)"
+
+      - name: Wait for version-bump
+        if: github.event_name == 'merge_group'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          BRANCH="merge-queue/wait-for-post-merge-workflow-to-finish/run"
+          HEAD_SHA=$(gh api "repos/${REPO}/git/ref/heads/${BRANCH}" --jq '.object.sha')
+          echo "Integration branch HEAD: $HEAD_SHA"
+
+          echo "Waiting 4s for GitHub to queue the version-bump workflow..."
+          sleep 4
+
+          TIMEOUT=60
+          INTERVAL=3
+          ELAPSED=0
+          ITERATION=0
+
+          while [ $ELAPSED -lt $TIMEOUT ]; do
+            ITERATION=$((ITERATION + 1))
+
+            STATUS=$(gh api "repos/${REPO}/actions/workflows/version-bump.yml/runs?head_sha=${HEAD_SHA}" \
+              --jq '.workflow_runs[0].status // "not_found"')
+
+            echo "Poll #${ITERATION} (${ELAPSED}s elapsed): status=${STATUS}"
+
+            if [ "$STATUS" = "completed" ] || [ "$STATUS" = "not_found" ]; then
+              break
+            fi
+
+            sleep $INTERVAL
+            ELAPSED=$((ELAPSED + INTERVAL))
+          done
+
+          if [ $ELAPSED -ge $TIMEOUT ]; then
+            echo "Timeout reached (${TIMEOUT}s). Proceeding anyway."
+          fi
+
+      - name: Pass
+        run: echo "CI passed"
