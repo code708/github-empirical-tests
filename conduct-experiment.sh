@@ -9,6 +9,18 @@ RUN_ID="merge-queue-wait-for-post-merge-workflow-to-finish-$(date +%Y-%m-%dT%H%M
 
 log() { printf "[%s] %s\n" "$(date +%H:%M:%S)" "$*" >&2; }
 
+cleanup() {
+  log "Cleaning up: closing open PRs"
+  for n in 1 2 3 4; do
+    gh pr list --repo "${REPO}" --base "${BASE}" --head "${PREFIX}/pr-${n}" --state open --json url --jq '.[].url' \
+      | while read -r url; do
+        log "  Closing ${url}"
+        gh pr close "${url}" --repo "${REPO}" 2>/dev/null || true
+      done
+  done
+}
+trap cleanup EXIT
+
 create_pr() {
   local n=$1
   local branch="${PREFIX}/pr-${n}"
