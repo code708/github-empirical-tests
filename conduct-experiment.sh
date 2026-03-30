@@ -41,7 +41,7 @@ wait_for_ci() {
   local pr=$1
   log "Waiting for CI on ${pr}"
   until gh pr checks "${pr}" --repo "${REPO}" --watch 2>/dev/null; do
-    sleep 3
+    sleep 2
   done
   log "CI passed on ${pr}"
 }
@@ -49,7 +49,7 @@ wait_for_ci() {
 enqueue() {
   local pr=$1
   log "Enqueuing ${pr}"
-  gh pr merge "${pr}" --repo "${REPO}" --merge-queue
+  gh pr merge "${pr}" --repo "${REPO}" --auto --rebase
   log "Enqueued ${pr}"
 }
 
@@ -98,6 +98,9 @@ gh pr list --repo "${REPO}" --base "${BASE}" --state open --json url --jq '.[].u
     gh pr close "${url}" --repo "${REPO}" 2>/dev/null || true
   done
 
+log "Disabling version-bump workflow"
+gh workflow disable version-bump.yml --repo "${REPO}"
+
 MAIN_SHA=$(gh api "repos/${REPO}/git/ref/heads/${MAIN_BRANCH}" --jq '.object.sha')
 
 log "Resetting branches to ${MAIN_BRANCH}"
@@ -116,6 +119,9 @@ for ref in "${BASE}" "${PREFIX}/pr-1" "${PREFIX}/pr-2" "${PREFIX}/pr-3" "${PREFI
     log "  Created ${ref}"
   fi
 done
+
+log "Enabling version-bump workflow"
+gh workflow enable version-bump.yml --repo "${REPO}"
 
 # ── Test 1: Validate mechanism (1 PR) ──
 
